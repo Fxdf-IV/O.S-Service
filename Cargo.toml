@@ -1,8 +1,8 @@
 [package]
-name = "it-service-desk"
+name = "O.S Service"
 version = "0.1.0"
 description = "Sistema de Gestão de Ordens de Serviço"
-authors = ["you"]
+authors = ["Fxdf-IV"]
 edition = "2021"
 
 [build-dependencies]
