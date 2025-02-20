@@ -5,58 +5,53 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT NOT NULL UNIQUE,                           -- Email do usuário (obrigatório, unico)
     created_date DATETIME DEFAULT CURRENT_TIMESTAMP,      -- Data de criação (obrigatório)
     user_password TEXT NOT NULL,                          -- Senha do usuário (obrigatório)
-    CHECK (                                               -- Restrição para a senha
-        LENGTH(user_password) >= 8 AND                    -- Comprimento da senha (no mínimo 8 caracteres)
-        user_password GLOB '[A-Z]*' AND                   -- Deve conter pelo menos uma letra maiúscula
-        user_password GLOB '[0-9]*'                       -- Deve conter pelo menos um número
-    ),
     user_status TEXT NOT NULL DEFAULT 'active',           -- Status do usuário (obrigatório)
-    cellphone_number INTEGER NOT NULL,                    -- Celular do usuário (obrigatório)
+    cellphone_number TEXT NOT NULL,                       -- Celular do usuário (obrigatório)
     user_departament_id INTEGER NOT NULL,                 -- ID do departamento do usuário (obrigatório)
     FOREIGN KEY (user_departament_id) REFERENCES departaments(id_departament),
     ramal_user_number INTEGER NOT NULL,                   -- Ramal do usuário (obrigatório)
     FOREIGN KEY (ramal_user_number) REFERENCES ramals(ramal_number),
     id_user_location INTEGER NOT NULL,                    -- Localização do usuário (obrigatório)
-    FOREIGN KEY (id_user_location) REFERENCES locations(id_location)
+    FOREIGN KEY (id_user_location) REFERENCES locations(id_location),
 );
 
--- Tabela de Tenicos
+-- Tabela de Técnicos
 CREATE TABLE IF NOT EXISTS technicians (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_name TEXT NOT NULL,
-    email TEXT NOT NULL UNIQUE,                           
-    created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    user_password TEXT NOT NULL,                          -- Senha do usuário (obrigatório)
-    CHECK (                                               -- Restrição para a senha
-        LENGTH(user_password) >= 8 AND                    -- Comprimento da senha (no mínimo 8 caracteres)
-        user_password GLOB '[A-Z]*' AND                   -- Deve conter pelo menos uma letra maiúscula
-        user_password GLOB '[0-9]*'                       -- Deve conter pelo menos um número
-    ),
-    technician_functions TEXT NOT NULL,                   -- Funções do tecnico (obrigatório)
-    technician_status TEXT NOT NULL DEFAULT 'active',
-    cellphone_number INTEGER NOT NULL,
-    ramal_number INTEGER NOT NULL,
-    FOREIGN KEY (ramal_number) REFERENCES ramals(ramal_number),
-    id_location INTEGER NOT NULL,
-    FOREIGN KEY (id_location) REFERENCES locations(id_location)
+    technician_id INTEGER PRIMARY KEY,                    -- Chave primária
+    FOREIGN KEY (technician_id) REFERENCES users(id),     -- Referência ao usuário
+);
+
+-- Tabela de Administradores
+CREATE TABLE IF NOT EXISTS admins (
+    admin_id INTEGER PRIMARY KEY,                         -- Chave primária
+    FOREIGN KEY (admin_id) REFERENCES users(id),          -- Referência ao usuário
 );
 
 -- Tabela de Tickets
 CREATE TABLE IF NOT EXISTS tickets (
     protocol INTEGER PRIMARY KEY AUTOINCREMENT,             -- Chave primária, identificador exclusivo auto-incrementado
-    type_ticket TEXT NOT NULL,                              -- Tipo de ticket (obrigatório)
-    created_date_ticket DATETIME DEFAULT CURRENT_TIMESTAMP, -- Data de criação (obrigatório)
-    description_ticket TEXT NOT NULL,                       -- Descricao do ticket (obrigatório)
-    problem_date DATETIME DEFAULT CURRENT_TIMESTAMP,        -- Data do problema (obrigatório)
-    validate_code TEXT UNIQUE,                              -- Código de validação (obrigatório)
-    user_id_requester INTEGER NOT NULL,                     -- ID do usuário (obrigatório)
+    type_ticket TEXT NOT NULL,                              -- Tipo de ticket
+    created_date_ticket DATETIME DEFAULT CURRENT_TIMESTAMP, -- Data de criação
+    description_ticket TEXT NOT NULL,                       -- Descricao do ticket
+    problem_category TEXT NOT NULL,                         -- Categoria do problema
+    problem_date DATETIME DEFAULT CURRENT_TIMESTAMP,        -- Data do problema
+    user_id_requester INTEGER NOT NULL,                     -- ID do usuário
     FOREIGN KEY (user_id_requester) REFERENCES users(id),
+    location_id_requester INTEGER NOT NULL,                 -- Localização do usuário
+    FOREIGN KEY (location_id_requester) REFERENCES locations(id_location),
 
-    status_ticket TEXT NOT NULL,                            -- Status do ticket (obrigatório)
-    conclusion_date DATETIME DEFAULT CURRENT_TIMESTAMP,     -- Data da conclusão (obrigatório)
-    solution_description TEXT NOT NULL,                     -- Descrição da solução (obrigatório)
-    technician_id_solver INTEGER NOT NULL,                  -- ID do tecnico (obrigatório)
-    FOREIGN KEY (technician_id_solver) REFERENCES technicians(id)
+    status_ticket TEXT NOT NULL,                            -- Status do ticket
+    conclusion_date DATETIME DEFAULT CURRENT_TIMESTAMP,     -- Data da conclusão
+    solution_description TEXT NOT NULL,                     -- Descrição da solução
+    technician_id_solver INTEGER NOT NULL,                  -- ID do tecnico
+    FOREIGN KEY (technician_id_solver) REFERENCES users(id),
+   
+    item_is_used BOOLEAN NOT NULL DEFAULT FALSE ,           -- Itens usados
+    CHECK (
+        item_is_used = FALSE OR item_id_used IS NOT NULL
+    ),
+    item_id_used INTEGER,
+    FOREIGN KEY (item_id_used) REFERENCES inventory_items(id_item)
 );
 
 -- Trigger para gerar o código de validação ao inserir um novo ticket
@@ -71,41 +66,40 @@ END;
 
 CREATE TABLE IF NOT EXISTS locations (
     id_location INTEGER PRIMARY KEY AUTOINCREMENT,
-    address_location TEXT NOT NULL,
-    address_number INTEGER NOT NULL,
-    neighborhood TEXT NOT NULL,
-    cep INTEGER NOT NULL,
-    department TEXT NOT NULL,
-    room TEXT NOT NULL,
-    ramal_number INTEGER NOT NULL,
+    address_location TEXT NOT NULL,                             -- Endereço
+    address_number INTEGER NOT NULL,                            -- Número do endereço
+    neighborhood TEXT NOT NULL,                                 -- Bairro   
+    department TEXT NOT NULL,                                   -- Departamento
+    room TEXT NOT NULL,                                         -- Sala
+    ramal_number INTEGER NOT NULL,                              -- Ramal
     FOREIGN KEY (ramal_number) REFERENCES ramals(ramal_number)
 );
 
 CREATE TABLE IF NOT EXISTS departaments (
-    id_departament INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    name_departament TEXT NOT NULL
-    departament_location_id INTEGER NOT NULL,
-    FOREIGN KEY (departament_location_id) REFERENCES locations(id_location)
-    departament_ramal INTEGER NOT NULL,
+    id_departament INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,   -- Chave primária, identificador exclusivo auto-incrementado
+    name_departament TEXT NOT NULL,                              -- Nome do departamento
+    departament_location_id INTEGER NOT NULL,                    -- Localização do departamento
+    FOREIGN KEY (departament_location_id) REFERENCES locations(id_location),
+    departament_ramal INTEGER NOT NULL,                         -- Ramal do departamento
     FOREIGN KEY (departament_ramal) REFERENCES ramals(ramal_number)
 );
 
-CREATE TABLE IF NOT EXISTS ramals (
-    ramal_number INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    ramal_name TEXT NOT NULL,
-    ramal_location INTEGER NOT NULL,
+CREATE TABLE IF NOT EXISTS ramals ( 
+    ramal_number INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,     -- Ramal
+    ramal_name TEXT NOT NULL,                                    -- Nome do ramal
+    ramal_location INTEGER NOT NULL,                             -- Localização do ramal
     FOREIGN KEY (ramal_location) REFERENCES locations(id_location),
-    ramal_departament INTEGER NOT NULL,
+    ramal_departament INTEGER NOT NULL,                         -- Departamento do ramal
     FOREIGN KEY (ramal_departament) REFERENCES departaments(id_departament)
 );
 
-CREATE TABLE IF NOT EXISTS inventory_itens (
-    id_iten INTEGER PRIMARY KEY AUTOINCREMENT,
-    name_iten TEXT NOT NULL,
-    type_iten TEXT NOT NULL,
-    quantity_iten INTEGER NOT NULL,
-    buy_date DATETIME NOT NULL,
-    status_iten TEXT NOT NULL,
-    location_iten_id INTEGER NOT NULL,
-    FOREIGN KEY (location_iten_id) REFERENCES locations(id_location)
+CREATE TABLE IF NOT EXISTS inventory_items (
+    id_item INTEGER PRIMARY KEY AUTOINCREMENT,                   -- Chave primária, identificador exclusivo auto-incrementado
+    name_item TEXT NOT NULL,                                     -- Nome do item
+    type_item TEXT NOT NULL,                                     -- Tipo do item
+    quantity_item INTEGER NOT NULL,                              -- Quantidade do item
+    buy_date DATETIME NOT NULL,                                  -- Data de compra
+    status_item TEXT NOT NULL,                                   -- Status do item
+    location_item_id INTEGER NOT NULL,                           -- Localização do item
+    FOREIGN KEY (location_item_id) REFERENCES locations(id_location)
 );
