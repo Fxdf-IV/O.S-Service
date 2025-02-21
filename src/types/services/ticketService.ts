@@ -1,6 +1,6 @@
 import { invoke } from '@tauri-apps/api/tauri';
 import { useState } from 'react';
-import { TicketFormData, Ticket } from '../tickets.types';
+import { TicketFormData, TicketForTechnician } from '../tickets.types';
 
 export const useTicketService = () => {
     const [loading, setLoading] = useState(false);
@@ -21,7 +21,7 @@ export const useTicketService = () => {
         }
     };
 
-    const getTickets = async (): Promise<Ticket[]> => {
+    const getTickets = async (): Promise<TicketForTechnician[]> => {
         setLoading(true);
         setError(null);
 

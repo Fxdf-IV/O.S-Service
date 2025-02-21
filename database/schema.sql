@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,                 -- Chave primária, identificador exclusivo auto-incrementado
     user_name TEXT NOT NULL,                              -- Nome do usuário (obrigatório)
     email TEXT NOT NULL UNIQUE,                           -- Email do usuário (obrigatório, unico)
-    created_date DATETIME DEFAULT CURRENT_TIMESTAMP,      -- Data de criação (obrigatório)
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,      -- Data de criação (obrigatório)
     user_password TEXT NOT NULL,                          -- Senha do usuário (obrigatório)
     user_status TEXT NOT NULL DEFAULT 'active',           -- Status do usuário (obrigatório)
     cellphone_number TEXT NOT NULL,                       -- Celular do usuário (obrigatório)
@@ -30,18 +30,19 @@ CREATE TABLE IF NOT EXISTS admins (
 -- Tabela de Tickets
 CREATE TABLE IF NOT EXISTS tickets (
     protocol INTEGER PRIMARY KEY AUTOINCREMENT,             -- Chave primária, identificador exclusivo auto-incrementado
-    type_ticket TEXT NOT NULL,                              -- Tipo de ticket
-    created_date_ticket DATETIME DEFAULT CURRENT_TIMESTAMP, -- Data de criação
+    ticket_category TEXT NOT NULL,                          -- Tipo de ticket
     description_ticket TEXT NOT NULL,                       -- Descricao do ticket
+    created_at_ticket DATETIME DEFAULT CURRENT_TIMESTAMP,   -- Data de criação
     problem_category TEXT NOT NULL,                         -- Categoria do problema
-    problem_date DATETIME DEFAULT CURRENT_TIMESTAMP,        -- Data do problema
+    problem_at DATETIME DEFAULT CURRENT_TIMESTAMP,          -- Data do problema
     user_id_requester INTEGER NOT NULL,                     -- ID do usuário
     FOREIGN KEY (user_id_requester) REFERENCES users(id),
     location_id_requester INTEGER NOT NULL,                 -- Localização do usuário
     FOREIGN KEY (location_id_requester) REFERENCES locations(id_location),
 
     status_ticket TEXT NOT NULL,                            -- Status do ticket
-    conclusion_date DATETIME DEFAULT CURRENT_TIMESTAMP,     -- Data da conclusão
+    conclusion_at DATETIME DEFAULT CURRENT_TIMESTAMP,       -- Data da conclusão
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,          -- Data das atualizações
     solution_description TEXT NOT NULL,                     -- Descrição da solução
     technician_id_solver INTEGER NOT NULL,                  -- ID do tecnico
     FOREIGN KEY (technician_id_solver) REFERENCES users(id),
@@ -98,7 +99,7 @@ CREATE TABLE IF NOT EXISTS inventory_items (
     name_item TEXT NOT NULL,                                     -- Nome do item
     type_item TEXT NOT NULL,                                     -- Tipo do item
     quantity_item INTEGER NOT NULL,                              -- Quantidade do item
-    buy_date DATETIME NOT NULL,                                  -- Data de compra
+    buyed_at DATETIME NOT NULL,                                  -- Data de compra
     status_item TEXT NOT NULL,                                   -- Status do item
     location_item_id INTEGER NOT NULL,                           -- Localização do item
     FOREIGN KEY (location_item_id) REFERENCES locations(id_location)

@@ -7,8 +7,11 @@ import { TicketFormData, TicketCategory } from '../../../types/tickets.types';
 const INITIAL_FORM_STATE: TicketFormData = {
     category: 'other',
     description: '',
-    created_date: new Date(),
-    problem_date: new Date()
+    created_at: new Date(),
+    problem_at: new Date(),
+    priority: 'high',
+    location_id: 0,
+    user_id: 0,
 };
 
 const CATEGORIES: TicketCategory[] = ['hardware', 'software', 'network', 'printer', 'other'];
@@ -18,12 +21,15 @@ export const TicketForm: React.FC = () => {
     const { createTicket, loading, error } = useTicketService();
     const [formData, setFormData] = useState<TicketFormData>(INITIAL_FORM_STATE);
     const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+    const [showCancelDialog, setShowCancelDialog] = useState(false);
 
     const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
+        const { name, value, type } = e.target as HTMLInputElement;
+        const newValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+        
         setFormData(prev => ({
             ...prev,
-            [name]: value
+            [name]: newValue
         }));
     }, []);
 
@@ -62,6 +68,16 @@ export const TicketForm: React.FC = () => {
         }
     };
 
+    const handleCancel = () => {
+        // Se o formulário foi modificado, mostra o diálogo de confirmação
+        if (JSON.stringify(formData) !== JSON.stringify(INITIAL_FORM_STATE)) {
+            setShowCancelDialog(true);
+        } else {
+            // Se não houve modificações, volta direto para a página inicial
+            navigate('/');
+        }
+    };
+
     return (
         <Stack component="form" onSubmit={handleSubmit} spacing={3} className="ticket-container">
             <div className="ticket-box">
@@ -74,6 +90,17 @@ export const TicketForm: React.FC = () => {
                 )}
 
                 <Stack spacing={2}>
+                    <TextField
+                        required
+                        fullWidth
+                        multiline
+                        rows={4}
+                        name="description"
+                        label="Descrição"
+                        value={formData.description}
+                        onChange={handleInputChange}
+                    />
+
                     <FormControl fullWidth required>
                         <InputLabel>Categoria</InputLabel>
                         <Select
@@ -90,29 +117,32 @@ export const TicketForm: React.FC = () => {
                         </Select>
                     </FormControl>
 
-                    <TextField
-                        required
-                        fullWidth
-                        multiline
-                        rows={4}
-                        name="description"
-                        label="Descrição"
-                        value={formData.description}
-                        onChange={handleInputChange}
-                    />
+                    <Stack direction="row" spacing={2}>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            color="primary"
+                            disabled={loading}
+                            fullWidth
+                        >
+                            {loading ? 'Criando...' : 'Confirmar'}
+                        </Button>
 
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        disabled={loading}
-                        fullWidth
-                    >
-                        {loading ? 'Criando...' : 'Criar Ticket'}
-                    </Button>
+                        <Button
+                            type="button"
+                            variant="outlined"
+                            color="error"
+                            disabled={loading}
+                            fullWidth
+                            onClick={handleCancel}
+                        >
+                            Cancelar
+                        </Button>
+                    </Stack>
                 </Stack>
             </div>
 
+            {/* Diálogo de Sucesso */}
             <Dialog open={showSuccessDialog} onClose={() => handleSuccessDialogClose(false)}>
                 <DialogTitle>Ticket Criado com Sucesso!</DialogTitle>
                 <DialogContent>
@@ -124,6 +154,29 @@ export const TicketForm: React.FC = () => {
                     </Button>
                     <Button onClick={() => handleSuccessDialogClose(false)} autoFocus>
                         Voltar para a Página Inicial
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Diálogo de Confirmação de Cancelamento */}
+            <Dialog open={showCancelDialog} onClose={() => setShowCancelDialog(false)}>
+                <DialogTitle>Confirmar Cancelamento</DialogTitle>
+                <DialogContent>
+                    Você tem certeza que deseja cancelar? Todas as informações inseridas serão perdidas.
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setShowCancelDialog(false)}>
+                        Não, Continuar Editando
+                    </Button>
+                    <Button 
+                        onClick={() => {
+                            setShowCancelDialog(false);
+                            navigate('/');
+                        }} 
+                        color="error" 
+                        autoFocus
+                    >
+                        Sim, Cancelar
                     </Button>
                 </DialogActions>
             </Dialog>
