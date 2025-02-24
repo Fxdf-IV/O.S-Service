@@ -3,76 +3,61 @@ import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
-  };
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      const serverResponse = await fetch("http://localhost:5000/login", {
+      const response = await fetch("http://localhost:5000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
+        body: JSON.stringify({ email, password }),
       });
 
-      const loginResponse = await serverResponse.json();
+      const data = await response.json();
 
-      if (serverResponse.ok) {
-        alert("Login bem-sucedido!");
+      if (response.ok) {
+        navigate("/dashboard"); // Redireciona para o dashboard, por exemplo
+      } else {
+        setError(data.message || "Erro no login");
       }
-      setError(loginResponse.message);
-
-    } catch (error: any) {
-      console.error("Erro ao conectar com o servidor:", error);
-      setError("Erro ao conectar com o servidor (" +error + ")");
+    } catch (error) {
+      setError("Erro ao conectar com o servidor");
+    } finally {
+      setLoading(false); // Finaliza o estado de loading
     }
-  };
-
-  const handleNavigateToRegister = () => {
-    navigate("/RegisterPage");
   };
 
   return (
     <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit} style={{ display: "inline-block" }}>
+      <h1>Login</h1>
+      <form onSubmit={handleSubmit}>
         <input
           type="email"
-          id="email"
-          value={formData.email}
-          onChange={handleChange}
           placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           required
         />
         <br />
         <input
           type="password"
-          id="password"
-          value={formData.password}
-          onChange={handleChange}
           placeholder="Senha"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           required
         />
         <br />
-        <button type="submit">Entrar</button>
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        <button type="submit" disabled={loading}>
+          {loading ? "Carregando..." : "Entrar"}
+        </button>
       </form>
-
-      <p>Não possui cadastro? Cadastre-se aqui:</p>
-      <button type="button" onClick={handleNavigateToRegister}>Cadastrar</button>
+      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 };

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",             // Usa as funcionalidades mais recentes do JavaScript
+    "module": "CommonJS",           // Define o sistema de módulos (compatível com Node.js)
+    "rootDir": "src",               // Define a pasta onde está o código TypeScript
+    "outDir": "dist",               // Define onde o código compilado será salvo
+    "moduleResolution": "node",     // Garante que módulos sejam resolvidos corretamente
+    "esModuleInterop": true,        // Ajuda a importar módulos CommonJS sem problemas
+    "forceConsistentCasingInFileNames": true,  // Evita problemas de diferenciação de maiúsculas/minúsculas
+    "strict": true,                 // Habilita verificações mais rigorosas no TypeScript
+    "skipLibCheck": true            // Pula a checagem de arquivos de bibliotecas para acelerar a compilação
+  }
+}
