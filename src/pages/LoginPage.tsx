@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { inputStyle, buttonStyle } from '../styles/styles.tsx';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const LoginPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        navigate("/HomePage");     // Redireciona para o HomePage
+        navigate("/home");         // Redireciona para o HomePage
       } else {
         setError(data.message || "Erro no login");
       }
@@ -43,6 +44,7 @@ const LoginPage = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          style={inputStyle}
         />
         <br />
         <input
@@ -51,14 +53,23 @@ const LoginPage = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          style={inputStyle}
         />
         <br /><br />
         
-        <button type="submit" disabled={loading}>
-          {loading ? "Aguarde" : "Entrar"}
+        <button 
+          type="submit" 
+          style={{ ...buttonStyle, backgroundColor: '#666' }}
+          disabled={loading}> {loading ? "Aguarde" : "Entrar"}
         </button>
       </form>
-        <button type="button" onClick={() => navigate("/register-page")}>
+
+      <br /><br />
+
+        <button 
+          type="button" 
+          onClick={() => navigate("/register-page")}
+          style={{ ...buttonStyle, backgroundColor: '#666' }}>
           Cadastrar
         </button>
 

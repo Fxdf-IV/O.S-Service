@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import InputMask from "react-input-mask";
+import { inputStyle, selectStyle, buttonStyle , labelStyle } from '../styles/styles.tsx';
 
 interface Department {
   id_departament: number;
@@ -274,37 +275,5 @@ const RegisterPage = () => {
   );
 };
 
-const labelStyle = {
-  display: 'block',
-  marginBottom: '5px',
-  fontWeight: 'bold' as const
-};
-
-const inputStyle = {
-  width: '100%',
-  padding: '8px',
-  borderRadius: '4px',
-  border: '1px solid #ddd',
-  fontSize: '16px'
-};
-
-const selectStyle = {
-  width: '100%',
-  padding: '8px',
-  borderRadius: '4px',
-  border: '1px solid #ddd',
-  fontSize: '16px',
-  backgroundColor: 'white'
-};
-
-const buttonStyle = {
-  padding: '10px 20px',
-  backgroundColor: '#4CAF50',
-  color: 'white',
-  border: 'none',
-  borderRadius: '4px',
-  cursor: 'pointer',
-  fontSize: '16px'
-};
 
 export default RegisterPage;

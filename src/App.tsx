@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import LoginPage from './pages/LoginPage.tsx';
 import RegisterPage from './pages/RegisterPage.tsx';
 import HomePage from './pages/HomePage.tsx';
+import AdminUserManagement from './pages/AdminUserManagement.tsx';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/create-user" element={<RegisterPage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/register-page" element={<RegisterPage />} />
+        <Route path="/admin-user-management" element={<AdminUserManagement />} />
       </Routes>
     </Router>
   );
