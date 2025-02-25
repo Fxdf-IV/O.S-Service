@@ -3,6 +3,7 @@ import LoginPage from './pages/LoginPage.tsx';
 import RegisterPage from './pages/RegisterPage.tsx';
 import HomePage from './pages/HomePage.tsx';
 import AdminUserManagement from './pages/AdminUserManagement.tsx';
+import CreateTicketPage from './pages/CreateTicketPage.tsx';
 
 function App() {
   return (
@@ -10,10 +11,10 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/create-user" element={<RegisterPage />} />
-        <Route path="/home" element={<HomePage />} />
         <Route path="/register-page" element={<RegisterPage />} />
-        <Route path="/admin-user-management" element={<AdminUserManagement />} />
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/admin/users" element={<AdminUserManagement />} />
+        <Route path="/create-ticket" element={<CreateTicketPage />} />
       </Routes>
     </Router>
   );
