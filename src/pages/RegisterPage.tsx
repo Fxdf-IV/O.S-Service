@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import InputMask from "react-input-mask";
 
 interface Department {
   id_departament: number;
@@ -26,7 +27,7 @@ const RegisterPage = () => {
     cellphone_number: '',
     user_departament_id: '',
     ramal_user_number: '',
-    id_user_location: ''
+    id_user_location: '',
   });
 
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -62,14 +63,14 @@ const RegisterPage = () => {
         }
 
         // Buscar ramais
-        console.log('Fetching ramals...');
-        const ramalResponse = await fetch('/api/ramals');
+        console.log("Fetching ramals...");
+        const ramalResponse = await fetch("/api/ramals");
         if (ramalResponse.ok) {
           const ramalData = await ramalResponse.json();
-          console.log('Ramals data:', ramalData);
+          console.log("Ramals data:", ramalData);
           setRamals(ramalData);
         } else {
-          console.error('Failed to fetch ramals:', ramalResponse.status);
+          console.error("Failed to fetch ramals:", ramalResponse.status);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -81,7 +82,10 @@ const RegisterPage = () => {
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    const newValue = name === "ramal_user_number" ? value.replace(/\D/g, "") : value;
+
+    setFormData({ ...formData, [e.target.name]: newValue });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -173,8 +177,9 @@ const RegisterPage = () => {
 
         <div style={{ marginBottom: '15px' }}>
           <label htmlFor="cellphone_number" style={labelStyle}>Celular:</label>
-          <input
-            type="tel"
+          <InputMask
+            mask="(99) 99999-9999"
+            placeholder="(00) 00000-0000"
             id="cellphone_number"
             name="cellphone_number"
             value={formData.cellphone_number}
@@ -184,6 +189,35 @@ const RegisterPage = () => {
           />
         </div>
 
+        <div style={{ marginBottom: "15px" }}>
+          <label htmlFor="ramal_user_number" style={labelStyle}>Ramal:</label>
+          <input
+            type="text"
+            id="ramal_user_number"
+            name="ramal_user_number"
+            value={formData.ramal_user_number}
+            onChange={handleChange}
+            required
+            placeholder="Digite seu ramal"
+            maxLength={5}
+            style={inputStyle}
+          />
+
+          {/* Lista de ramais */}
+          {ramals.length > 0 && (
+            <div style={{ marginTop: "8px", fontSize: "14px", color: "#666" }}>
+              <p>Ramais disponíveis:</p>
+              <ul style={{ listStyleType: "none", paddingLeft: 0 }}>
+                {ramals.map((ramal) => (
+                  <li key={ramal.ramal_number} style={{ marginBottom: "4px" }}>
+                    {ramal.ramal_number}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+        
         <div style={{ marginBottom: '15px' }}>
           <label htmlFor="user_departament_id" style={labelStyle}>Departamento:</label>
           <select
@@ -203,24 +237,6 @@ const RegisterPage = () => {
           </select>
         </div>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="ramal_user_number" style={labelStyle}>Ramal:</label>
-          <select
-            id="ramal_user_number"
-            name="ramal_user_number"
-            value={formData.ramal_user_number}
-            onChange={handleChange}
-            required
-            style={selectStyle}
-          >
-            <option value="">Selecione um ramal</option>
-            {ramals.map((ramal) => (
-              <option key={ramal.ramal_number} value={ramal.ramal_number}>
-                {ramal.ramal_number}
-              </option>
-            ))}
-          </select>
-        </div>
 
         <div style={{ marginBottom: '15px' }}>
           <label htmlFor="id_user_location" style={labelStyle}>Localização:</label>

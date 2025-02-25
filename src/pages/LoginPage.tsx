@@ -22,14 +22,14 @@ const LoginPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        navigate("/dashboard"); // Redireciona para o dashboard, por exemplo
+        navigate("/HomePage");     // Redireciona para o HomePage
       } else {
         setError(data.message || "Erro no login");
       }
     } catch (error) {
       setError("Erro ao conectar com o servidor");
     } finally {
-      setLoading(false); // Finaliza o estado de loading
+      setLoading(false);           // Finaliza o estado de loading
     }
   };
 
@@ -52,11 +52,16 @@ const LoginPage = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <br />
+        <br /><br />
+        
         <button type="submit" disabled={loading}>
-          {loading ? "Carregando..." : "Entrar"}
+          {loading ? "Aguarde" : "Entrar"}
         </button>
       </form>
+        <button type="button" onClick={() => navigate("/register-page")}>
+          Cadastrar
+        </button>
+
       {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );

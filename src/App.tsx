@@ -10,7 +10,8 @@ function App() {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/create-user" element={<RegisterPage />} />
-        <Route path="/home" element={<HomePage />} /> {/* Corrigido para HomePage */}
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/register-page" element={<RegisterPage />} />
       </Routes>
     </Router>
   );
